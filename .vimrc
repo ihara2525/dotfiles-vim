@@ -55,7 +55,7 @@ set shiftwidth=2
 set modelines=0
 
 " カーソルがある行を反転する
-set cursorline
+"set cursorline
 "highlight CursorLine term=reverse cterm=reverse
 
 " 自動でインデントする
@@ -96,7 +96,8 @@ set showmatch
 set laststatus=2
 
 " ステータスラインの表示
-set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff}%{']'}%y%{fugitive#statusline()}\ %F%=%l,%c%V%8P
+"set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff}%{']'}%y%{fugitive#statusline()}\ %F%=%l,%c%V%8P
+set statusline=%<[%n]%m%r%h%w%{'['.(&fenc!=''?&fenc:&enc).':'.&ff}%{']'}%y%{fugitive#statusline()}\ %F%=
 
 " コマンドライン補間をシェルっぽく
 set wildmode=list:longest
@@ -254,3 +255,6 @@ vnoremap <silent> sh :Str2HexLiteral<CR> " あ => \\xE3\\x81\\x82
 
 " 早い端末を使う
 set ttyfast
+
+" BufExplorer
+nmap <c-l> :BufExplorer<CR>

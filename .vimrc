@@ -78,7 +78,15 @@ set incsearch
 
 " タブ文字の表示
 set list
-set listchars=tab:\ \ ,trail:\ 
+set listchars=tab:\ \ ,trail:\
+
+" ファイル保存時に行末のスペースを削除する
+" function StripTrailingWhitespaces()
+"   let pos = getpos(".")
+"   %s/\s\+$//e
+"   call setpos(".", pos)
+" endfunction
+" autocmd BufWritePre * :call StripTrailingWhitespaces()
 
 " コメント行が連続するときはコメントに
 set formatoptions+=r
@@ -258,3 +266,49 @@ set ttyfast
 
 " BufExplorer
 nmap <c-l> :BufExplorer<CR>
+
+" 自動的に閉じ括弧を入力する
+" imap { {}<LEFT>
+" imap [ []<LEFT>
+" imap ( ()<LEFT>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vimshell
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" ,is: シェルを起動
+nnoremap <silent> ,is :VimShell<CR>
+
+" ,irb: irbを非同期で起動
+nnoremap <silent> ,irb :VimShellInteractive irb<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" neocomplcache
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" AutoComplPopを無効にする
+let g:acp_enableAtStartup = 0
+
+" neocomplcacheを有効にする
+let g:neocomplcache_enable_at_startup = 1
+
+" 大文字小文字を区別する
+let g:NeoComplCache_SmartCase = 1
+
+" キャメルケース補完を有効にする
+let g:NeoComplCache_EnableCamelCaseCompletion = 1
+
+" アンダーバー補完を有効にする
+let g:NeoComplCache_EnableUnderbarCompletion = 1
+
+" Enterでポップアップを閉じて改行する
+inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
+
+" タブで保管する
+inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
+
+" C-h、バックスペースでポップアップを閉じて一文字削除する
+inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
+inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
+inoremap <expr><C-y>  neocomplcache#close_popup()
+inoremap <expr><C-e>  neocomplcache#cancel_popup()

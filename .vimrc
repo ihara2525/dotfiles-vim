@@ -1,7 +1,16 @@
+
 scriptencoding utf-8
 
 " add runtimepathe .vim/bundle/*
-call pathogen#runtime_append_all_bundles()
+" call pathogen#runtime_append_all_bundles()
+
+set rtp+=~/.vim/bundle/vundle/
+call vundle#rc()
+Bundle 'rails.vim'
+Bundle 'fugitive.vim'
+Bundle 'neocomplcache'
+Bundle 'bufexplorer.zip'
+Bundle 'yanktmp.vim'
 
 " Use Vim defaults instead of 100% vi compatibility
 set nocompatible
@@ -281,6 +290,12 @@ nnoremap <silent> ,is :VimShell<CR>
 
 " ,irb: irbを非同期で起動
 nnoremap <silent> ,irb :VimShellInteractive irb<CR>
+
+" ,ss: 非同期で開いたインタプリタに現在の行を評価させる
+vmap <silent> ,ss :VimShellSendString<CR>
+
+" 選択中に,ss: 非同期で開いたインタプリタに選択行を評価させる
+nnoremap <silent> ,ss <S-v>:VimShellSendString<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " neocomplcache

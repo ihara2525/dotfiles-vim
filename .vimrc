@@ -11,6 +11,7 @@ Bundle 'fugitive.vim'
 Bundle 'neocomplcache'
 Bundle 'unite.vim'
 Bundle 'yanktmp.vim'
+Bundle 'FuzzyFinder'
 Bundle 'L9'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

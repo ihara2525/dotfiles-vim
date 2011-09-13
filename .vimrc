@@ -11,7 +11,6 @@ Bundle 'fugitive.vim'
 Bundle 'neocomplcache'
 Bundle 'unite.vim'
 Bundle 'yanktmp.vim'
-Bundle 'FuzzyFinder'
 Bundle 'L9'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -393,21 +392,6 @@ inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
 inoremap <expr><C-y>  neocomplcache#close_popup()
 inoremap <expr><C-e>  neocomplcache#cancel_popup()
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" FuzzyFinder
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-nnoremap <unique> <silent> <C-S> :FufBuffer!<CR>
-nnoremap <unique> <silent> ef :FufFile!<CR>
-nnoremap <silent> eff :FufFile!<CR>
-nnoremap <silent> efm :FufMruFile!<CR>
-autocmd FileType fuf nmap <C-c> <ESC>
-let g:fuf_patternSeparator = ' '
-let g:fuf_modesDisable = ['mrucmd']
-let g:fuf_mrufile_exclude = '\v\~$|\.bak$|\.swp|\.howm$'
-let g:fuf_mrufile_maxItem = 2000
-let g:fuf_enumeratingLimit = 20
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 挿入モード時、ステータスラインの色を変更する

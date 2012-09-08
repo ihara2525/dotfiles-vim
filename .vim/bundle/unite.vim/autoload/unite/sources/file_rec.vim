@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: file_rec.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 01 Jul 2011.
+" Last Modified: 23 Aug 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -28,91 +28,335 @@ let s:save_cpo = &cpo
 set cpo&vim
 
 " Variables  "{{{
-call unite#util#set_default('g:unite_source_file_rec_ignore_pattern',
-      \'\%(^\|/\)\.$\|\~$\|\.\%(o|exe|dll|bak|sw[po]\)$\|\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)')
-call unite#util#set_default('g:unite_source_file_rec_min_cache_files', 50)
+call unite#util#set_default(
+      \ 'g:unite_source_file_rec_ignore_pattern',
+      \'\%(^\|/\)\.$\|\~$\|\.\%(o\|exe\|dll\|bak\|sw[po]\|class\)$'.
+      \'\|\%(^\|/\)\.\%(hg\|git\|bzr\|svn\)\%($\|/\)')
+call unite#util#set_default(
+      \ 'g:unite_source_file_rec_min_cache_files', 100)
 "}}}
 
-function! unite#sources#file_rec#define()"{{{
-  return s:source
-endfunction"}}}
+let s:Cache = vital#of('unite.vim').import('System.Cache')
 
-let s:source = {
-      \ 'name' : 'file_rec',
-      \ 'description' : 'candidates from directory by recursive',
-      \ 'max_candidates' : 50,
-      \ }
+function! unite#sources#file_rec#define()"{{{
+  return [ s:source_rec ]
+        \ + [ executable('find')
+        \   && unite#util#has_vimproc() ? s:source_async : {} ]
+endfunction"}}}
 
 let s:continuation = {}
 
-function! s:source.gather_candidates(args, context)"{{{
-  if !empty(a:args)
-    let l:directory = a:args[0]
-  elseif isdirectory(a:context.input)
-    let l:directory = a:context.input
-  else
-    let l:directory = getcwd()
-  endif
-  let l:directory = unite#util#substitute_path_separator(
-        \ substitute(l:directory, '^\~', unite#util#substitute_path_separator($HOME), ''))
+" Source rec.
+let s:source_rec = {
+      \ 'name' : 'file_rec',
+      \ 'description' : 'candidates from directory by recursive',
+      \ 'hooks' : {},
+      \ 'max_candidates' : 50,
+      \ 'ignore_pattern' : g:unite_source_file_rec_ignore_pattern,
+      \ }
 
-  call unite#print_message('[file_rec] directory: ' . l:directory)
+function! s:source_rec.gather_candidates(args, context)"{{{
+  let a:context.source__directory = s:get_path(a:args, a:context)
 
-  let a:context.source__directory = l:directory
-  if a:context.is_redraw || !has_key(s:continuation, l:directory)
-        \ || len(s:continuation[l:directory].cached) < 50
-    let a:context.is_async = 1
-
-    " Initialize continuation.
-    let s:continuation[l:directory] = {
-          \ 'files' : [l:directory],
-          \ 'cached' : [],
-          \ }
-  endif
-
-  let l:continuation = s:continuation[a:context.source__directory]
-
-  if empty(l:continuation.files)
-    " Disable async.
-    call unite#print_message('[file_rec] Directory traverse was completed.')
+  let directory = a:context.source__directory
+  if directory == ''
+    " Not in project directory.
+    call unite#print_source_message(
+          \ 'Not in project directory.', s:source_rec.name)
     let a:context.is_async = 0
+    return []
   endif
 
-  return l:continuation.cached
+  call unite#print_source_message(
+        \ 'directory: ' . directory, s:source_rec.name)
+
+  call s:init_continuation(a:context, directory)
+
+  let continuation = s:continuation[directory]
+
+  if empty(continuation.rest) || continuation.end
+    " Disable async.
+    call unite#print_source_message(
+          \ 'Directory traverse was completed.', s:source_rec.name)
+    let a:context.is_async = 0
+    let continuation.end = 1
+  endif
+
+  return deepcopy(continuation.files)
 endfunction"}}}
 
-function! s:source.async_gather_candidates(args, context)"{{{
-  let l:continuation = s:continuation[a:context.source__directory]
-  let [l:continuation.files, l:files] = s:get_files(l:continuation.files, 1, 30)
+function! s:source_rec.async_gather_candidates(args, context)"{{{
+  let continuation = s:continuation[a:context.source__directory]
 
-  if empty(l:continuation.files)
-    call unite#print_message('[file_rec] Directory traverse was completed.')
+  let [continuation.rest, files] =
+        \ s:get_files(continuation.rest, 1, 20)
+
+  if empty(continuation.rest)
+    call unite#print_source_message(
+          \ 'Directory traverse was completed.', s:source_rec.name)
 
     " Disable async.
     let a:context.is_async = 0
+    let continuation.end = 1
   endif
 
-  let l:is_relative_path =
-        \ a:context.source__directory == unite#util#substitute_path_separator(getcwd())
+  let is_relative_path =
+        \ a:context.source__directory ==
+        \   unite#util#substitute_path_separator(getcwd())
 
-  let l:candidates = []
-  for l:file in l:files
-    let l:dict = {
-        \ 'word' : unite#util#substitute_path_separator(fnamemodify(l:file, ':p')),
-        \ 'abbr' : unite#util#substitute_path_separator(fnamemodify(l:file, ':.')),
-        \ 'kind' : 'file',
-        \ }
-    let l:dict.action__path = l:dict.word
-    let l:dict.action__directory = l:is_relative_path ?
-          \ fnamemodify(unite#util#path2directory(l:file), ':.') :
-          \ unite#util#path2directory(l:dict.action__path)
+  if !is_relative_path
+    let cwd = getcwd()
+    lcd `=a:context.source__directory`
+  endif
 
-    call add(l:candidates, l:dict)
+  let mods = a:context.input == '' ? ':.' : ':p'
+
+  let candidates = map(files, "{
+        \ 'word' : unite#util#substitute_path_separator(
+        \    fnamemodify(v:val, mods)),
+        \ 'action__path' : v:val,
+        \ }")
+
+  if !is_relative_path
+    lcd `=cwd`
+  endif
+
+  let continuation.files += candidates
+  if empty(continuation.rest)
+    call s:write_cache(a:context.source__directory,
+          \ continuation.files)
+  endif
+
+  return deepcopy(candidates)
+endfunction"}}}
+
+function! s:source_rec.hooks.on_post_filter(args, context)"{{{
+  call s:on_post_filter(a:args, a:context)
+endfunction"}}}
+
+function! s:source_rec.vimfiler_check_filetype(args, context)"{{{
+  let path = unite#util#substitute_path_separator(
+        \ unite#util#expand(join(a:args, ':')))
+  let path = unite#util#substitute_path_separator(
+        \ simplify(fnamemodify(path, ':p')))
+
+  if isdirectory(path)
+    let type = 'directory'
+    let lines = []
+    let dict = {}
+  else
+    return []
+  endif
+
+  return [type, lines, dict]
+endfunction"}}}
+function! s:source_rec.vimfiler_gather_candidates(args, context)"{{{
+  let path = s:get_path(a:args, a:context)
+
+  if !isdirectory(path)
+    let a:context.source__directory = path
+
+    return []
+  endif
+
+  " Initialize.
+  let candidates = copy(self.gather_candidates(a:args, a:context))
+  while a:context.is_async
+    " Gather all candidates.
+
+    " User input check.
+    echo 'File searching...(if press any key, will cancel.)'
+    redraw
+    if getchar(0)
+      break
+    endif
+
+    let candidates += self.async_gather_candidates(a:args, a:context)
+  endwhile
+  redraw!
+
+  let old_dir = getcwd()
+  if path !=# old_dir
+        \ && isdirectory(path)
+    lcd `=path`
+  endif
+
+  let exts = unite#util#is_windows() ?
+        \ escape(substitute($PATHEXT . ';.LNK', ';', '\\|', 'g'), '.') : ''
+
+  " Set vimfiler property.
+  for candidate in candidates
+    call unite#sources#file#create_vimfiler_dict(candidate, exts)
   endfor
 
-  let l:continuation.cached += l:candidates
+  if path !=# old_dir
+        \ && isdirectory(path)
+    lcd `=old_dir`
+  endif
 
-  return l:candidates
+  return deepcopy(candidates)
+endfunction"}}}
+function! s:source_rec.vimfiler_dummy_candidates(args, context)"{{{
+  let path = unite#util#substitute_path_separator(
+        \ unite#util#expand(join(a:args, ':')))
+  let path = unite#util#substitute_path_separator(
+        \ simplify(fnamemodify(path, ':p')))
+
+  if path == ''
+    return []
+  endif
+
+  let old_dir = getcwd()
+  if path !=# old_dir
+        \ && isdirectory(path)
+    lcd `=path`
+  endif
+
+  let exts = unite#util#is_windows() ?
+        \ escape(substitute($PATHEXT . ';.LNK', ';', '\\|', 'g'), '.') : ''
+
+  let is_relative_path = path !~ '^\%(/\|\a\+:/\)'
+
+  " Set vimfiler property.
+  let candidates = [ unite#sources#file#create_file_dict(path, is_relative_path) ]
+  for candidate in candidates
+    call unite#sources#file#create_vimfiler_dict(candidate, exts)
+  endfor
+
+  if path !=# old_dir
+        \ && isdirectory(path)
+    lcd `=old_dir`
+  endif
+
+  return deepcopy(candidates)
+endfunction"}}}
+function! s:source_rec.vimfiler_complete(args, context, arglead, cmdline, cursorpos)"{{{
+  return unite#sources#file#complete_directory(
+        \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
+endfunction"}}}
+function! s:source_rec.complete(args, context, arglead, cmdline, cursorpos)"{{{
+  return unite#sources#file#complete_directory(
+        \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
+endfunction"}}}
+
+" Source async.
+let s:source_async = {
+      \ 'name' : 'file_rec/async',
+      \ 'description' : 'asyncronous candidates from directory by recursive',
+      \ 'hooks' : {},
+      \ 'max_candidates' : 50,
+      \ 'ignore_pattern' : g:unite_source_file_rec_ignore_pattern,
+      \ }
+
+function! s:source_async.gather_candidates(args, context)"{{{
+  let a:context.source__directory = s:get_path(a:args, a:context)
+
+  let directory = a:context.source__directory
+  if directory == ''
+    " Not in project directory.
+    call unite#print_source_message(
+          \ 'Not in project directory.', s:source_async.name)
+    let a:context.is_async = 0
+    return []
+  endif
+
+  call unite#print_source_message(
+        \ 'directory: ' . directory, s:source_async.name)
+
+  call s:init_continuation(a:context, directory)
+
+  let continuation = s:continuation[directory]
+
+  if empty(continuation.rest) || continuation.end
+    " Disable async.
+    call unite#print_source_message(
+          \ 'Directory traverse was completed.', s:source_async.name)
+    let a:context.is_async = 0
+    let continuation.end = 1
+
+    return deepcopy(continuation.files)
+  endif
+
+  let a:context.source__proc = vimproc#pgroup_open(
+        \ printf('find ''%s'' -type f', directory))
+
+  " Close handles.
+  call a:context.source__proc.stdin.close()
+
+  return []
+endfunction"}}}
+
+function! s:source_async.async_gather_candidates(args, context)"{{{
+  let stderr = a:context.source__proc.stderr
+  if !stderr.eof
+    " Print error.
+    let errors = filter(stderr.read_lines(-1, 100),
+          \ "v:val !~ '^\\s*$'")
+    if !empty(errors)
+      call unite#print_source_error(errors, s:source_async.name)
+    endif
+  endif
+
+  let continuation = s:continuation[a:context.source__directory]
+
+  let stdout = a:context.source__proc.stdout
+  if stdout.eof
+    " Disable async.
+    call unite#print_source_message(
+          \ 'Directory traverse was completed.', s:source_async.name)
+    let a:context.is_async = 0
+    let continuation.end = 1
+  endif
+
+  let is_relative_path =
+        \ a:context.source__directory ==
+        \   unite#util#substitute_path_separator(getcwd())
+
+  if !is_relative_path
+    let cwd = getcwd()
+    lcd `=a:context.source__directory`
+  endif
+
+  let mods = a:context.input == '' ? ':.' : ':p'
+
+  let candidates = []
+  for filename in map(filter(
+        \ stdout.read_lines(-1, 100), 'v:val != ""'),
+        \ "fnamemodify(unite#util#iconv(v:val, 'char', &encoding), ':p')")
+    if filename !~ '/\.\%(hg\|git\|bzr\|svn\)\%($\|/\)'
+      call add(candidates, {
+            \ 'word' : unite#util#substitute_path_separator(
+            \    fnamemodify(filename, mods)),
+            \ 'action__path' : filename,
+            \ })
+    endif
+  endfor
+
+  if !is_relative_path
+    lcd `=cwd`
+  endif
+
+  let continuation.files += candidates
+  if stdout.eof
+    call s:write_cache(a:context.source__directory,
+          \ continuation.files)
+  endif
+
+  return deepcopy(candidates)
+endfunction"}}}
+
+function! s:source_async.hooks.on_close(args, context) "{{{
+  if has_key(a:context, 'source__proc')
+    call a:context.source__proc.waitpid()
+  endif
+endfunction "}}}
+function! s:source_async.hooks.on_post_filter(args, context)"{{{
+  call s:on_post_filter(a:args, a:context)
+endfunction"}}}
+
+function! s:source_async.complete(args, context, arglead, cmdline, cursorpos)"{{{
+  return unite#sources#file#complete_directory(
+        \ a:args, a:context, a:arglead, a:cmdline, a:cursorpos)
 endfunction"}}}
 
 " Add custom action table."{{{
@@ -124,73 +368,217 @@ function! s:cdable_action_rec.func(candidate)
   call unite#start([['file_rec', a:candidate.action__directory]])
 endfunction
 
+let s:cdable_action_rec_parent = {
+      \ 'description' : 'open parent directory by file_rec source',
+      \}
+
+function! s:cdable_action_rec_parent.func(candidate)
+  call unite#start([['file_rec', unite#util#substitute_path_separator(
+        \ fnamemodify(a:candidate.action__directory, ':h'))
+        \ ]])
+endfunction
+
+let s:cdable_action_rec_async = {
+      \ 'description' : 'open this directory by file_rec/async source',
+      \}
+
+function! s:cdable_action_rec_async.func(candidate)
+  call unite#start([['file_rec/async', a:candidate.action__directory]])
+endfunction
+
+let s:cdable_action_rec_parent_async = {
+      \ 'description' : 'open parent directory by file_rec/async source',
+      \}
+
+function! s:cdable_action_rec_parent_async.func(candidate)
+  call unite#start([['file_rec/async', unite#util#substitute_path_separator(
+        \ fnamemodify(a:candidate.action__directory, ':h'))
+        \ ]])
+endfunction
+
 call unite#custom_action('cdable', 'rec', s:cdable_action_rec)
+call unite#custom_action('cdable', 'rec_parent', s:cdable_action_rec_parent)
+call unite#custom_action('cdable', 'rec/async', s:cdable_action_rec_async)
+call unite#custom_action('cdable', 'rec_parent/async', s:cdable_action_rec_parent_async)
 unlet! s:cdable_action_rec
+unlet! s:cdable_action_rec_async
 "}}}
 
-function! s:get_files(files, level, max_len)"{{{
-  let l:continuation_files = []
-  let l:ret_files = []
-  let l:files_index = 0
-  let l:ret_files_len = 0
-  for l:file in a:files
-    let l:files_index += 1
+" Filters"{{{
+function! s:source_rec.source__converter(candidates, context)"{{{
+  return s:converter(a:candidates, a:context)
+endfunction"}}}
 
-    if l:file =~ '/\.\+$'
-          \ || (g:unite_source_file_rec_ignore_pattern != '' &&
-          \     l:file =~ g:unite_source_file_rec_ignore_pattern)
+let s:source_rec.filters =
+      \ ['matcher_default', 'matcher_hide_hidden_files',
+      \  'sorter_default',
+      \  s:source_rec.source__converter]
+
+function! s:source_async.source__converter(candidates, context)"{{{
+  return s:converter(a:candidates, a:context)
+endfunction"}}}
+
+let s:source_async.filters =
+      \ ['matcher_default', 'matcher_hide_hidden_files',
+      \  'sorter_default',
+      \  s:source_async.source__converter]
+"}}}
+
+" Misc.
+function! s:get_path(args, context)"{{{
+  let directory = get(
+        \ filter(copy(a:args), "v:val != '!'"), 0, '')
+  if directory == ''
+    let directory = isdirectory(a:context.input) ?
+          \ a:context.input : getcwd()
+  endif
+
+  if get(a:args, 0, '') == '!'
+    " Use project directory.
+    return unite#util#path2project_directory(directory, 1)
+  endif
+
+  return unite#util#substitute_path_separator(
+        \ substitute(fnamemodify(directory, ':p'), '^\~',
+        \ unite#util#substitute_path_separator($HOME), ''))
+endfunction"}}}
+function! s:get_files(files, level, max_len)"{{{
+  let continuation_files = []
+  let ret_files = []
+  let files_index = 0
+  let ret_files_len = 0
+  for file in a:files
+    let files_index += 1
+
+    if file =~ '/\.\+$\|/\.\%(hg\|git\|bzr\|svn\)\%($\|/\)'
+          \ || isdirectory(file) && getftype(file) ==# 'link'
       continue
     endif
 
-    if isdirectory(l:file) && getftype(l:file) !=# 'link'
-      if l:file != '/' && l:file =~ '/$'
-        let l:file = l:file[: -2]
+    if isdirectory(file)
+      if file != '/' && file =~ '/$'
+        let file = file[: -2]
       endif
 
-      let l:child_index = 0
-      let l:childs = split(unite#util#substitute_path_separator(glob(l:file . '/*')), '\n')
-            \ + split(unite#util#substitute_path_separator(glob(l:file . '/.*')), '\n')
-      for l:child in l:childs
-        let l:child_index += 1
+      let child_index = 0
+      let children = unite#util#glob(file.'/*') +
+            \ unite#util#glob(file.'/.*')
+      for child in children
+        let child = substitute(child, '\/$', '', '')
+        let child_index += 1
 
-        if l:child =~ '/\.\+$'
-              \ ||(g:unite_source_file_rec_ignore_pattern != '' &&
-              \     l:child =~ g:unite_source_file_rec_ignore_pattern)
+        if child =~ '/\.\+$\|/\.\%(hg\|git\|bzr\|svn\)\%($\|/\)'
+              \ || isdirectory(child) && getftype(child) ==# 'link'
           continue
         endif
 
-        if isdirectory(l:child) && getftype(l:file) !=# 'link'
-          if a:level < 5 && l:ret_files_len < a:max_len
-            let [l:continuation_files_child, l:ret_files_child] =
-                  \ s:get_files([l:child], a:level + 1, a:max_len - l:ret_files_len)
-            let l:continuation_files += l:continuation_files_child
-            let l:ret_files += l:ret_files_child
+        if isdirectory(child)
+          if a:level < 5 && ret_files_len < a:max_len
+            let [continuation_files_child, ret_files_child] =
+                  \ s:get_files([child], a:level + 1, a:max_len - ret_files_len)
+            let continuation_files += continuation_files_child
+            let ret_files += ret_files_child
           else
-            call add(l:continuation_files, l:child)
+            call add(continuation_files, child)
           endif
         else
-          call add(l:ret_files, l:child)
-        endif
+          call add(ret_files, child)
 
-        let l:ret_files_len += 1
+          let ret_files_len += 1
 
-        if l:ret_files_len > a:max_len
-          let l:continuation_files += l:childs[l:child_index :]
-          break
+          if ret_files_len > a:max_len
+            let continuation_files += children[child_index :]
+            break
+          endif
         endif
       endfor
     else
-      call add(l:ret_files, l:file)
-      let l:ret_files_len += 1
+      call add(ret_files, file)
+      let ret_files_len += 1
     endif
 
-    if l:ret_files_len > a:max_len
+    if ret_files_len > a:max_len
       break
     endif
   endfor
 
-  let l:continuation_files += a:files[l:files_index :]
-  return [l:continuation_files, l:ret_files]
+  let continuation_files += a:files[files_index :]
+  return [continuation_files, map(ret_files,
+        \ "unite#util#substitute_path_separator(fnamemodify(v:val, ':p'))")]
+endfunction"}}}
+function! s:on_post_filter(args, context)"{{{
+  for candidate in a:context.candidates
+    let candidate.kind = 'file'
+    let candidate.action__directory =
+          \ unite#util#path2directory(candidate.action__path)
+  endfor
+endfunction"}}}
+function! s:init_continuation(context, directory)"{{{
+  let cache_dir = g:unite_data_directory . '/file_rec'
+  if !has_key(s:continuation, a:directory)
+        \ && s:Cache.filereadable(cache_dir, a:directory)
+    " Use cache file.
+
+    let is_relative_path =
+          \ a:context.source__directory ==
+          \   unite#util#substitute_path_separator(getcwd())
+
+    if !is_relative_path
+      let cwd = getcwd()
+      lcd `=a:context.source__directory`
+    endif
+
+    let mods = a:context.input == '' ? ':.' : ':p'
+
+    let files = map(s:Cache.readfile(cache_dir, a:directory), "{
+          \ 'word' : unite#util#substitute_path_separator(
+          \    fnamemodify(v:val, mods)),
+          \ 'action__path' : v:val,
+          \ }")
+
+    let s:continuation[a:directory] = {
+          \ 'files' : files,
+          \ 'rest' : [],
+          \ 'directory' : a:directory, 'end' : 1,
+          \ }
+
+    if !is_relative_path
+      lcd `=cwd`
+    endif
+  elseif a:context.is_redraw
+        \ || !has_key(s:continuation, a:directory)
+    let a:context.is_async = 1
+
+    let s:continuation[a:directory] = {
+          \ 'files' : [], 'rest' : [a:directory],
+          \ 'directory' : a:directory, 'end' : 0,
+          \ }
+  endif
+endfunction"}}}
+function! s:converter(candidates, context)"{{{
+  let is_relative_path =
+        \ a:context.source__directory ==
+        \   unite#util#substitute_path_separator(getcwd())
+
+  for candidate in a:candidates
+    let candidate.abbr = candidate.word .
+          \ (isdirectory(candidate.word) ? '/' : '')
+  endfor
+
+  return a:candidates
+endfunction"}}}
+function! s:write_cache(directory, files)"{{{
+  let cache_dir = g:unite_data_directory . '/file_rec'
+
+  if g:unite_source_file_rec_min_cache_files > 0
+        \ && len(a:files) >
+        \ g:unite_source_file_rec_min_cache_files
+    call s:Cache.writefile(cache_dir, a:directory,
+          \ map(copy(a:files), 'v:val.action__path'))
+  elseif s:Cache.filereadable(cache_dir, a:directory)
+    " Delete old cache files.
+    call s:Cache.delete(cache_dir, a:directory)
+  endif
 endfunction"}}}
 
 let &cpo = s:save_cpo

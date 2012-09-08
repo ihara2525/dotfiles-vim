@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: output.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 22 Apr 2011.
+" Last Modified: 21 Aug 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -37,23 +37,40 @@ endfunction"}}}
 let s:source = {
       \ 'name' : 'output',
       \ 'description' : 'candidates from Vim command output',
-      \ 'default_action' : { '*' : 'yank' },
+      \ 'default_action' : 'yank',
       \ }
 
 function! s:source.gather_candidates(args, context)"{{{
-  let l:command = get(a:args, 0)
-  if l:command == ''
-    let l:command = input('Please input Vim command: ', '', 'command')
+  if type(get(a:args, 0, '')) == type([])
+    " Use args directly.
+    let result = a:args[0]
+  else
+    let command = join(a:args, ' ')
+    if command == ''
+      let command = input('Please input Vim command: ', '', 'command')
+    endif
+
+    redir => output
+    silent! execute command
+    redir END
+
+    let result = split(output, '\r\n\|\n')
   endif
 
-  redir => l:result
-  silent execute l:command
-  redir END
-
-  return map(split(l:result, '\r\n\|\n'), '{
+  return map(result, '{
         \ "word" : v:val,
         \ "kind" : "word",
         \ }')
+endfunction"}}}
+function! s:source.complete(args, context, arglead, cmdline, cursorpos)"{{{
+  if !exists('*neocomplcache#sources#vim_complete#helper#command')
+    return []
+  endif
+
+  let pattern = '\.\%(\h\w*\)\?$\|' . neocomplcache#get_keyword_pattern_end('vim')
+  let [cur_keyword_pos, cur_keyword_str] = neocomplcache#match_word(a:arglead, pattern)
+  return map(neocomplcache#sources#vim_complete#helper#command(
+        \ a:arglead, cur_keyword_str), 'v:val.word')
 endfunction"}}}
 
 let &cpo = s:save_cpo

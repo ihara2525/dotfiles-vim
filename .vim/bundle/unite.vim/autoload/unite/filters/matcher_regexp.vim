@@ -1,7 +1,7 @@
 "=============================================================================
 " FILE: matcher_regexp.vim
 " AUTHOR:  Shougo Matsushita <Shougo.Matsu@gmail.com>
-" Last Modified: 02 Jul 2011.
+" Last Modified: 01 Sep 2012.
 " License: MIT license  {{{
 "     Permission is hereby granted, free of charge, to any person obtaining
 "     a copy of this software and associated documentation files (the
@@ -38,28 +38,44 @@ let s:matcher = {
 
 function! s:matcher.filter(candidates, context)"{{{
   if a:context.input == ''
-    return a:candidates
+    return unite#util#filter_matcher(
+          \ a:candidates, '', a:context)
   endif
 
-  let l:candidates = copy(a:candidates)
-  for l:input in split(a:context.input, '\\\@<! ')
-    if l:input !~ '[~\\.^$[\]*]'
-      " Optimized filter.
-      let l:input = substitute(l:input, '\\\(.\)', '\1', 'g')
-      let l:expr = &ignorecase ?
-            \ printf('stridx(tolower(v:val.word), %s) != -1', string(tolower(l:input))) :
-            \ printf('stridx(v:val.word, %s) != -1', string(l:input))
-
-      call filter(l:candidates, l:expr)
-    else
-      try
-        call filter(l:candidates, 'v:val.word =~ ' . string(l:input))
-      catch
-      endtry
-    endif
+  let candidates = a:candidates
+  for input in split(a:context.input, '\\\@<! ')
+    let candidates = unite#filters#matcher_regexp#regexp_matcher(
+          \ candidates, input, a:context)
   endfor
 
-  return l:candidates
+  return candidates
+endfunction"}}}
+
+function! unite#filters#matcher_regexp#regexp_matcher(candidates, input, context)"{{{
+  let input = a:input
+  if input =~ '^!'
+    if input == '!'
+      return a:candidates
+    endif
+    " Exclusion match.
+    let expr = 'v:val.word !~ '.string(input[1:])
+  elseif input !~ '[~\\.^$\[\]*]'
+    " Optimized filter.
+    let input = substitute(input, '\\\(.\)', '\1', 'g')
+    let expr = &ignorecase ?
+          \ printf('stridx(tolower(v:val.word), %s) != -1',
+          \    string(tolower(input))) :
+          \ printf('stridx(v:val.word, %s) != -1',
+          \    string(input))
+  else
+    let expr = 'v:val.word =~ '.string(input)
+  endif
+
+  try
+    return unite#util#filter_matcher(a:candidates, expr, a:context)
+  catch
+    return []
+  endtry
 endfunction"}}}
 
 let &cpo = s:save_cpo

@@ -6,16 +6,25 @@ scriptencoding utf-8
 
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
-Bundle 'rails.vim'
+Bundle 'tpope/vim-rails'
 Bundle 'fugitive.vim'
 Bundle 'neocomplcache'
-Bundle 'unite.vim'
+Bundle 'git://github.com/Shougo/vimfiler.git'
+Bundle 'git://github.com/Shougo/unite.vim.git'
+Bundle 'git://github.com/Shougo/vimshell.git'
+Bundle 'git://github.com/Shougo/vimproc.git'
 Bundle 'yanktmp.vim'
 Bundle 'L9'
+Bundle 'git://git.wincent.com/command-t.git'
+Bundle 'vim-coffee-script'
+Bundle 'surround.vim'
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" 行番号を表示する
+set number
 
 " Use Vim defaults instead of 100% vi compatibility
 set nocompatible
@@ -84,8 +93,10 @@ set smartcase
 " 検索時に最後まで行ったら最初に戻る
 set wrapscan
 
-" 検索で色をつけない
-set nohlsearch
+" 検索で色をつける
+set hlsearch
+" Esc連打で色を消す
+nmap <Esc><Esc> :nohlsearch<CR><Esc>
 
 " 検索文字列入力時に順次対象文字列にヒットさせる
 set incsearch
@@ -102,8 +113,11 @@ set listchars=tab:\ \ ,trail:\
 " endfunction
 " autocmd BufWritePre * :call StripTrailingWhitespaces()
 
-" コメント行が連続するときはコメントに
-set formatoptions+=r
+" 挿入モードで改行した時に # を自動挿入しない
+set formatoptions-=r
+
+" ノーマルモードで o や O をした時に # を自動挿入しない
+set formatoptions-=o
 
 " テキスト挿入中の自動折り返しを日本語に対応させる
 set formatoptions+=mM
@@ -282,6 +296,9 @@ set ttyfast
 " imap [ []<LEFT>
 " imap ( ()<LEFT>
 
+" Enterで空行を挿入する
+noremap <CR> o<ESC>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " unite.vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -291,7 +308,7 @@ let g:unite_enable_start_insert=1
 " バッファ一覧
 nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
 " ファイル一覧
-nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file<CR>
+nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file file/new<CR>
 " レジスタ一覧
 nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
 " 最近使用したファイル一覧
@@ -302,14 +319,14 @@ nnoremap <silent> ,uu :<C-u>Unite buffer file_mru<CR>
 nnoremap <silent> ,ua :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
 
 " ウィンドウを分割して開く
-au FileType unite nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
-au FileType unite inoremap <silent> <buffer> <expr> <C-j> unite#do_action('split')
+au FileType unite nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('slit')
+au FileType unite inoremap <silent> <buffer> <expr> <C-j> unite#do_action('slit')
 " ウィンドウを縦に分割して開く
-au FileType unite nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
-au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vsplit')
+au FileType unite nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vplit')
+au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vplit')
 " ESCキーを2回押すと終了する
-au FileType unite nnoremap <silent> <buffer> <ESC><ESC> q
-au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>q
+au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
+au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " vimshell
@@ -349,7 +366,6 @@ inoremap <expr><C-y>  neocomplcache#close_popup()
 inoremap <expr><C-e>  neocomplcache#cancel_popup()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 
 " 自動的に閉じ括弧を入力する
 " imap { {}<LEFT>
@@ -396,6 +412,7 @@ inoremap <expr><C-e>  neocomplcache#cancel_popup()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 挿入モード時、ステータスラインの色を変更する
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 "let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=yellow cterm=none'
 let g:hi_insert = 'highlight StatusLine guifg=darkblue guibg=darkyellow gui=none ctermfg=blue ctermbg=white cterm=none'
 
@@ -426,3 +443,30 @@ function! s:GetHighlight(hi)
   let hl = substitute(hl, 'xxx', '', '')
   return hl
 endfunction
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" <space>cdで開いているファイルと同じディレクトリに移動する
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+command! -nargs=? -complete=dir -bang CD  call s:ChangeCurrentDir('<args>', '<bang>')
+function! s:ChangeCurrentDir(directory, bang)
+    if a:directory == ''
+        lcd %:p:h
+    else
+        execute 'lcd' . a:directory
+    endif
+
+    if a:bang == ''
+        pwd
+    endif
+endfunction
+
+" Change current directory.
+nnoremap <silent> <Space>cd :<C-u>CD<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CoffeeScript
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" vim-coffee-scriptが読み込まれないので設定...
+autocmd BufNewFile,BufRead *.coffee set filetype=coffee

@@ -6,6 +6,7 @@ scriptencoding utf-8
 
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
+Bundle 'gmarik/vundle'
 Bundle 'tpope/vim-rails'
 Bundle 'fugitive.vim'
 Bundle 'neocomplcache'

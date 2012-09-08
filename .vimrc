@@ -15,7 +15,6 @@ Bundle 'git://github.com/Shougo/vimshell.git'
 Bundle 'git://github.com/Shougo/vimproc.git'
 Bundle 'yanktmp.vim'
 Bundle 'L9'
-Bundle 'git://git.wincent.com/command-t.git'
 Bundle 'vim-coffee-script'
 Bundle 'surround.vim'
 

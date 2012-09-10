@@ -43,6 +43,7 @@ g:unite_cursor_line_highlight	unite.txt	/*g:unite_cursor_line_highlight*
 g:unite_data_directory	unite.txt	/*g:unite_data_directory*
 g:unite_enable_split_vertically	unite.txt	/*g:unite_enable_split_vertically*
 g:unite_enable_start_insert	unite.txt	/*g:unite_enable_start_insert*
+g:unite_enable_use_short_source_names	unite.txt	/*g:unite_enable_use_short_source_names*
 g:unite_kind_jump_list_after_jump_scroll	unite.txt	/*g:unite_kind_jump_list_after_jump_scroll*
 g:unite_kind_openable_cd_command	unite.txt	/*g:unite_kind_openable_cd_command*
 g:unite_kind_openable_lcd_command	unite.txt	/*g:unite_kind_openable_lcd_command*
@@ -251,14 +252,17 @@ unite-options-horizontal	unite.txt	/*unite-options-horizontal*
 unite-options-immediately	unite.txt	/*unite-options-immediately*
 unite-options-input	unite.txt	/*unite-options-input*
 unite-options-keep-focus	unite.txt	/*unite-options-keep-focus*
+unite-options-long-source-names	unite.txt	/*unite-options-long-source-names*
 unite-options-max-multi-lines	unite.txt	/*unite-options-max-multi-lines*
 unite-options-no-cursor-line	unite.txt	/*unite-options-no-cursor-line*
 unite-options-no-empty	unite.txt	/*unite-options-no-empty*
+unite-options-no-focus	unite.txt	/*unite-options-no-focus*
 unite-options-no-quit	unite.txt	/*unite-options-no-quit*
 unite-options-no-split	unite.txt	/*unite-options-no-split*
 unite-options-no-start-insert	unite.txt	/*unite-options-no-start-insert*
 unite-options-prompt	unite.txt	/*unite-options-prompt*
 unite-options-quick-match	unite.txt	/*unite-options-quick-match*
+unite-options-short-source-names	unite.txt	/*unite-options-short-source-names*
 unite-options-silent	unite.txt	/*unite-options-silent*
 unite-options-start-insert	unite.txt	/*unite-options-start-insert*
 unite-options-toggle	unite.txt	/*unite-options-toggle*

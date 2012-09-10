@@ -1,4 +1,6 @@
-colorscheme wombat256
+" カラースキーマをSolarizedにする
+" colorscheme wombat256
+colorscheme solarized
 
 highlight CursorIM guibg=Purple guifg=NONE
 highlight Search guibg=DarkBlue guifg=NONE

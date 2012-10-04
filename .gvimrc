@@ -1,6 +1,6 @@
 " カラースキーマをSolarizedにする
-" colorscheme wombat256
 colorscheme solarized
+" colorscheme wombat256
 
 highlight CursorIM guibg=Purple guifg=NONE
 highlight Search guibg=DarkBlue guifg=NONE
@@ -9,13 +9,15 @@ if has("gui_macvim")
   " タブを常に表示
   set showtabline=2
   " 透明度
-  set transparency=4
+  set transparency=6
   " ツールバーを非表示
   set guioptions-=T
   " アンチエイリアス
   set antialias
   " フォント
   set guifont=Ricty:h12
+  " カーソルを点滅させない
+  set guicursor=a:blinkon0
   " スクロールバーを非表示
   set guioptions-=r
   set guioptions-=R

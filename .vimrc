@@ -10,6 +10,7 @@ Bundle 'gmarik/vundle'
 Bundle 'tpope/vim-rails'
 Bundle 'fugitive.vim'
 Bundle 'neocomplcache'
+Bundle 'neocomplcache-snippets_complete'
 Bundle 'git://github.com/Shougo/vimfiler.git'
 Bundle 'git://github.com/Shougo/unite.vim.git'
 Bundle 'git://github.com/Shougo/vimshell.git'
@@ -58,6 +59,9 @@ set textwidth=0
 
 " バックアップファイルをつくらない
 set nobackup
+
+" swpファイルの出力場所
+set directory=~/.vim/tmp
 
 " read/write a .viminfo file, don't store more than
 set viminfo='500,<10000,s1000,\"500
@@ -367,6 +371,8 @@ let g:NeoComplCache_SmartCase = 1
 let g:NeoComplCache_EnableCamelCaseCompletion = 1
 " アンダーバー補完を有効にする
 let g:NeoComplCache_EnableUnderbarCompletion = 1
+" 2文字入力したら補完を有効にする
+let g:neocomplcache_auto_completion_start_length = 2
 " Enterでポップアップを閉じて改行する
 inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
 " タブで保管する
@@ -376,6 +382,14 @@ inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
 inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
 inoremap <expr><C-y>  neocomplcache#close_popup()
 inoremap <expr><C-e>  neocomplcache#cancel_popup()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" neocomplcache-snippets-complete
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:neocomplcache_snippets_dir='~/.vim/snippets'
+imap <C-k> <Plug>(neocomplcache_snippets_expand)
+smap <C-k> <Plug>(neocomplcache_snippets_expand)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -396,30 +410,6 @@ nnoremap <silent> ,irb :VimShellInteractive irb<CR>
 vmap <silent> ,ss :VimShellSendString<CR>
 " 選択中に,ss: 非同期で開いたインタプリタに選択行を評価させる
 nnoremap <silent> ,ss <S-v>:VimShellSendString<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" neocomplcache
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" AutoComplPopを無効にする
-let g:acp_enableAtStartup = 0
-" neocomplcacheを有効にする
-let g:neocomplcache_enable_at_startup = 1
-" 大文字小文字を区別する
-let g:NeoComplCache_SmartCase = 1
-" キャメルケース補完を有効にする
-let g:NeoComplCache_EnableCamelCaseCompletion = 1
-" アンダーバー補完を有効にする
-let g:NeoComplCache_EnableUnderbarCompletion = 1
-" Enterでポップアップを閉じて改行する
-inoremap <expr><CR>  neocomplcache#smart_close_popup() . "\<CR>"
-" タブで保管する
-inoremap <expr><TAB>  pumvisible() ? "\<C-n>" : "\<TAB>"
-" C-h、バックスペースでポップアップを閉じて一文字削除する
-inoremap <expr><C-h> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><BS> neocomplcache#smart_close_popup()."\<C-h>"
-inoremap <expr><C-y>  neocomplcache#close_popup()
-inoremap <expr><C-e>  neocomplcache#cancel_popup()
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 挿入モード時、ステータスラインの色を変更する

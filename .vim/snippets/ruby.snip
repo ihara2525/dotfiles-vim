@@ -1,0 +1,49 @@
+# ruby
+
+snippet     mc
+abbr        # coding: utf-8
+    # coding: utf-8
+
+snippet     class
+abbr        class end
+    class ${1:name}
+        ${2}
+    end
+
+# rspec
+
+snippet     dd
+abbr        describe do
+    describe '${1}' do
+        ${2}
+    end
+
+snippet     cd
+abbr        context do
+    context '${1}' do
+        ${2}
+    end
+
+snippet     bd
+abbr        before do
+    before do
+        ${1}
+    end
+
+snippet     b{
+abbr        before {}
+    before { ${1} }
+
+snippet     id
+abbr        it do
+    it '${1}' do
+        ${2}
+    end
+
+snippet     i{
+abbr        it {}
+    it { '${1}' }
+
+snippet     s{
+abbr        subject {}
+    subject { ${1} }

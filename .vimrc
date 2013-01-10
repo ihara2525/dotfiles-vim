@@ -20,6 +20,8 @@ Bundle 'L9'
 Bundle 'vim-coffee-script'
 Bundle 'surround.vim'
 Bundle 'Solarized'
+Bundle 'ZenCoding.vim'
+Bundle 'git://github.com/kana/vim-fakeclip.git'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 色
@@ -262,10 +264,11 @@ nnoremap enp :set nopaste<CR>
 noremap <silent> sy :call YanktmpYank()<CR>
 noremap <silent> sp :call YanktmpPaste_p()<CR>
 
-if has('macunix')
-  noremap <silent> sY :call system("pbcopy", @0)<CR>
-  noremap <silent> sP :r! pbpaste<CR>
-end
+"if has('macunix')
+"  noremap <silent> sY :call system("pbcopy", @0)<CR>
+"  noremap <silent> sP :r! pbpaste<CR>
+"end
+set clipboard=unnamed
 
 " for rails
 autocmd BufNewFile,BufRead app/**/*.rhtml set fenc=utf-8

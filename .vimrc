@@ -11,10 +11,6 @@ Bundle 'tpope/vim-rails'
 Bundle 'fugitive.vim'
 Bundle 'neocomplcache'
 Bundle 'neocomplcache-snippets_complete'
-Bundle 'git://github.com/Shougo/vimfiler.git'
-Bundle 'git://github.com/Shougo/unite.vim.git'
-Bundle 'git://github.com/Shougo/vimshell.git'
-Bundle 'git://github.com/Shougo/vimproc.git'
 Bundle 'yanktmp.vim'
 Bundle 'L9'
 Bundle 'vim-coffee-script'
@@ -22,6 +18,7 @@ Bundle 'surround.vim'
 Bundle 'Solarized'
 Bundle 'ZenCoding.vim'
 Bundle 'git://github.com/kana/vim-fakeclip.git'
+Bundle 'Command-T'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 色
@@ -49,6 +46,9 @@ endif
 
 " 行番号を表示する
 set number
+
+" タブページを常に表示する
+set showtabline=2
 
 " Use Vim defaults instead of 100% vi compatibility
 set nocompatible
@@ -81,14 +81,12 @@ set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.i
 if has("autocmd")
   filetype plugin on
   filetype indent on
-  " これらのftではインデントを無効に
-  " autocmd FileType php filetype indent off
-  " autocmd FileType xhtml :set indentexpr=
   autocmd FileType text setlocal textwidth=72
 endif
 
 " タブの入力を空白文字に置き換える
 set expandtab
+
 " タブ幅
 set tabstop=2
 set softtabstop=2
@@ -319,48 +317,6 @@ set ttyfast
 noremap <CR> o<ESC>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" unite.vim
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" 入力モードで開始する
-let g:unite_enable_start_insert=1
-" バッファ一覧
-nnoremap <silent> ,ub :<C-u>Unite buffer<CR>
-" ファイル一覧
-nnoremap <silent> ,uf :<C-u>UniteWithBufferDir -buffer-name=files file file/new<CR>
-" レジスタ一覧
-nnoremap <silent> ,ur :<C-u>Unite -buffer-name=register register<CR>
-" 最近使用したファイル一覧
-nnoremap <silent> ,um :<C-u>Unite file_mru<CR>
-" 常用セット
-nnoremap <silent> ,uu :<C-u>Unite buffer file_mru<CR>
-" 全部乗せ
-nnoremap <silent> ,ua :<C-u>UniteWithBufferDir -buffer-name=files buffer file_mru bookmark file<CR>
-
-" ウィンドウを分割して開く
-au FileType unite nnoremap <silent> <buffer> <expr> <C-j> unite#do_action('slit')
-au FileType unite inoremap <silent> <buffer> <expr> <C-j> unite#do_action('slit')
-" ウィンドウを縦に分割して開く
-au FileType unite nnoremap <silent> <buffer> <expr> <C-l> unite#do_action('vplit')
-au FileType unite inoremap <silent> <buffer> <expr> <C-l> unite#do_action('vplit')
-" ESCキーを2回押すと終了する
-au FileType unite nnoremap <silent> <buffer> <ESC><ESC> :q<CR>
-au FileType unite inoremap <silent> <buffer> <ESC><ESC> <ESC>:q<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vimshell
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" ,is: シェルを起動
-nnoremap <silent> ,is :VimShell<CR>
-" ,irb: irbを非同期で起動
-nnoremap <silent> ,irb :VimShellInteractive irb<CR>
-" ,ss: 非同期で開いたインタプリタに現在の行を評価させる
-vmap <silent> ,ss :VimShellSendString<CR>
-" 選択中に,ss: 非同期で開いたインタプリタに選択行を評価させる
-nnoremap <silent> ,ss <S-v>:VimShellSendString<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " neocomplcache
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -475,3 +431,13 @@ nnoremap <silent> <Space>cd :<C-u>CD<CR>
 
 " vim-coffee-scriptが読み込まれないので設定...
 autocmd BufNewFile,BufRead *.coffee set filetype=coffee
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Command-T
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+nnoremap <silent> ,t :CommandT<CR>
+nnoremap <silent> ,b :CommandTBuffer<CR>
+
+" ウィンドウを上部に表示する
+let g:CommandTMatchWindowAtTop=1

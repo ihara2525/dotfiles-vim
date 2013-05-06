@@ -17,7 +17,7 @@ Bundle 'vim-coffee-script'
 Bundle 'surround.vim'
 Bundle 'Solarized'
 Bundle 'ZenCoding.vim'
-Bundle 'git://github.com/kana/vim-fakeclip.git'
+Bundle 'kana/vim-fakeclip'
 Bundle 'Command-T'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -128,6 +128,11 @@ set listchars=tab:\ \ ,trail:\
 "   call setpos(".", pos)
 " endfunction
 " autocmd BufWritePre * :call StripTrailingWhitespaces()
+
+" 行末の改行を強調表示する
+highlight WhitespaceEOL ctermbg=red guibg=red
+match WhitespaceEOL /\s\+$/
+autocmd WinEnter * match WhitespaceEOL /\s\+$/
 
 " 挿入モードで改行した時に # を自動挿入しない
 set formatoptions-=r

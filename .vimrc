@@ -1,24 +1,46 @@
 scriptencoding utf-8
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" NeoBundle
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+if has('vim_starting')
+  set runtimepath+=~/.vim/bundle/neobundle.vim
+  call neobundle#rc(expand('~/.vim/bundle/'))
+endif
+NeoBundle 'gmarik/vundle'
+NeoBundle 'tpope/vim-rails'
+NeoBundle 'fugitive.vim'
+NeoBundle 'neocomplcache'
+NeoBundle 'neosnippet'
+NeoBundle 'yanktmp.vim'
+NeoBundle 'L9'
+NeoBundle 'vim-coffee-script'
+NeoBundle 'surround.vim'
+NeoBundle 'Solarized'
+NeoBundle 'ZenCoding.vim'
+NeoBundle 'kana/vim-fakeclip'
+NeoBundle 'Command-T'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundle
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
-Bundle 'gmarik/vundle'
-Bundle 'tpope/vim-rails'
-Bundle 'fugitive.vim'
-Bundle 'neocomplcache'
-Bundle 'neocomplcache-snippets_complete'
-Bundle 'yanktmp.vim'
-Bundle 'L9'
-Bundle 'vim-coffee-script'
-Bundle 'surround.vim'
-Bundle 'Solarized'
-Bundle 'ZenCoding.vim'
-Bundle 'kana/vim-fakeclip'
-Bundle 'Command-T'
+"set rtp+=~/.vim/bundle/vundle/
+"call vundle#rc()
+"Bundle 'gmarik/vundle'
+"Bundle 'tpope/vim-rails'
+"Bundle 'fugitive.vim'
+"Bundle 'neocomplcache'
+"Bundle 'neosnippet'
+"Bundle 'yanktmp.vim'
+"Bundle 'L9'
+"Bundle 'vim-coffee-script'
+"Bundle 'surround.vim'
+"Bundle 'Solarized'
+"Bundle 'ZenCoding.vim'
+"Bundle 'kana/vim-fakeclip'
+"Bundle 'Command-T'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 色
@@ -446,3 +468,9 @@ nnoremap <silent> ,b :CommandTBuffer<CR>
 
 " ウィンドウを上部に表示する
 let g:CommandTMatchWindowAtTop=1
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" git
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+autocmd Filetype gitcommit setlocal spell textwidth=72

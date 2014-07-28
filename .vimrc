@@ -18,7 +18,7 @@ NeoBundle 'L9'
 NeoBundle 'vim-coffee-script'
 NeoBundle 'surround.vim'
 NeoBundle 'Solarized'
-NeoBundle 'ZenCoding.vim'
+NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kana/vim-fakeclip'
 NeoBundle 'Command-T'
 
@@ -343,6 +343,16 @@ set ttyfast
 " Enterで空行を挿入する
 noremap <CR> o<ESC>
 
+" 自動的にコメント行を挿入しない
+augroup auto_comment_off
+	autocmd!
+	autocmd BufEnter * setlocal formatoptions-=ro
+augroup END
+
+" ビジュアルベルを使う
+set visualbell
+set noerrorbells
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " neocomplcache
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -474,3 +484,12 @@ let g:CommandTMatchWindowAtTop=1
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 autocmd Filetype gitcommit setlocal spell textwidth=72
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" emmet-vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+let g:user_emmet_settings = {
+\   'lang' : 'ja',
+\   'attr_quotes' : 'single'
+\ }

@@ -21,6 +21,7 @@ NeoBundle 'Solarized'
 NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kana/vim-fakeclip'
 NeoBundle 'Command-T'
+NeoBundle 'Yggdroot/indentLine'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundle
@@ -353,6 +354,12 @@ augroup END
 set visualbell
 set noerrorbells
 
+" undoファイル
+if has('persistent_undo')
+  set undofile
+  set undodir=~/.vim/tmp/,~/.vim/undo_files/
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " neocomplcache
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -493,3 +500,22 @@ let g:user_emmet_settings = {
 \   'lang' : 'ja',
 \   'attr_quotes' : 'single'
 \ }
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" peco
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+function! PecoOpen()
+  for filename in split(system("find . -type f | peco"), "\n")
+    execute "e" filename
+  endfor
+endfunction
+nnoremap <Leader>op :call PecoOpen()<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" indentLine
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" 適用するファイルタイプを設定する
+let g:indentLine_fileType = ['ruby', 'coffee', 'eruby', 'scss', 'yml']
+

@@ -3,6 +3,7 @@ L9
 Solarized
 emmet-vim
 fugitive.vim
+indentLine
 neocomplcache
 neosnippet
 surround.vim

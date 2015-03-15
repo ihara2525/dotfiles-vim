@@ -7,6 +7,7 @@ indentLine
 neocomplcache
 neosnippet
 surround.vim
+vim-bufonly
 vim-coffee-script
 vim-fakeclip
 vim-rails

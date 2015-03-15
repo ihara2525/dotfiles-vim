@@ -1,0 +1,9 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhist_cnt =7
+let g:netrw_dirhist_1='/Users/ihara/Dropbox/Documents/work/groups/app/views/page_histories'
+let g:netrw_dirhist_2='/Users/ihara/Dropbox/Documents/work/groupad/app/assets/stylesheets'
+let g:netrw_dirhist_3='/Users/ihara2525/Dropbox/Documents/work/groups/app/assets/stylesheets'
+let g:netrw_dirhist_4='/Users/ihara/Dropbox/Documents/work/groups/config/initializers'
+let g:netrw_dirhist_5='/Users/ihara/Dropbox/Documents/work/kampodesk/app/views/curings'
+let g:netrw_dirhist_6='/Users/ihara/Dropbox/Documents/work/kampodesk/app/assets/javascripts'
+let g:netrw_dirhist_7='/Users/ihara2525/tmp'

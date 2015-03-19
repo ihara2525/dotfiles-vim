@@ -354,6 +354,7 @@ g:indentLine_maxLines	indentLine.txt	/*g:indentLine_maxLines*
 g:indentLine_noConcealCursor	indentLine.txt	/*g:indentLine_noConcealCursor*
 g:indentLine_showFirstIndentLevel	indentLine.txt	/*g:indentLine_showFirstIndentLevel*
 g:loaded_indentLine	indentLine.txt	/*g:loaded_indentLine*
+g:marked_app	marked.txt	/*g:marked_app*
 g:neobundle#default_options	neobundle.txt	/*g:neobundle#default_options*
 g:neobundle#default_site	neobundle.txt	/*g:neobundle#default_site*
 g:neobundle#enable_name_conversion	neobundle.txt	/*g:neobundle#enable_name_conversion*
@@ -485,6 +486,13 @@ l9-introduction	l9.txt	/*l9-introduction*
 l9-usage	l9.txt	/*l9-usage*
 l9.txt	l9.txt	/*l9.txt*
 macros/rails.vim	rails.txt	/*macros\/rails.vim*
+marked	marked.txt	/*marked*
+marked-:MarkedOpen	marked.txt	/*marked-:MarkedOpen*
+marked-:MarkedQuit	marked.txt	/*marked-:MarkedQuit*
+marked-about	marked.txt	/*marked-about*
+marked-commands	marked.txt	/*marked-commands*
+marked-configuration	marked.txt	/*marked-configuration*
+marked.vim	marked.txt	/*marked.vim*
 member_complete	neocomplcache.txt	/*member_complete*
 neobundle	neobundle.txt	/*neobundle*
 neobundle#call_hook()	neobundle.txt	/*neobundle#call_hook()*

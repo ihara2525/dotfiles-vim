@@ -22,6 +22,9 @@ NeoBundle 'mattn/emmet-vim'
 NeoBundle 'kana/vim-fakeclip'
 NeoBundle 'Command-T'
 NeoBundle 'Yggdroot/indentLine'
+NeoBundle 'duff/vim-bufonly'
+NeoBundle 'itspriddle/vim-marked'
+NeoBundle 'fatih/vim-go'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vundle
@@ -395,26 +398,6 @@ imap <C-k> <Plug>(neocomplcache_snippets_expand)
 smap <C-k> <Plug>(neocomplcache_snippets_expand)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" 自動的に閉じ括弧を入力する
-" imap { {}<LEFT>
-" imap [ []<LEFT>
-" imap ( ()<LEFT>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" vimshell
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" ,is: シェルを起動
-nnoremap <silent> ,is :VimShell<CR>
-" ,irb: irbを非同期で起動
-nnoremap <silent> ,irb :VimShellInteractive irb<CR>
-" ,ss: 非同期で開いたインタプリタに現在の行を評価させる
-vmap <silent> ,ss :VimShellSendString<CR>
-" 選択中に,ss: 非同期で開いたインタプリタに選択行を評価させる
-nnoremap <silent> ,ss <S-v>:VimShellSendString<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " 挿入モード時、ステータスラインの色を変更する
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
@@ -519,3 +502,11 @@ nnoremap <Leader>op :call PecoOpen()<CR>
 " 適用するファイルタイプを設定する
 let g:indentLine_fileType = ['ruby', 'coffee', 'eruby', 'scss', 'yml']
 
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" vim-marked
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+autocmd BufNewFile,BufRead *.{md,mdwn,mkd,mkdn,mark*} set filetype=markdown
+
+autocmd FileType markdown nnoremap mo :<C-u>MarkedOpen<CR>

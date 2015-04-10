@@ -10,6 +10,7 @@ surround.vim
 vim-bufonly
 vim-coffee-script
 vim-fakeclip
+vim-go
 vim-marked
 vim-rails
 vundle

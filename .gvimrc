@@ -15,7 +15,7 @@ if has("gui_macvim")
   " アンチエイリアス
   set antialias
   " フォント
-  set guifont=Ricty:h12
+  set guifont=Ricty:h10
   " カーソルを点滅させない
   set guicursor=a:blinkon0
   " スクロールバーを非表示

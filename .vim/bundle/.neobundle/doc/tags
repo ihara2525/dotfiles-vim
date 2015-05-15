@@ -1,6 +1,7 @@
 'g:go_auto_type_info'	vim-go.txt	/*'g:go_auto_type_info'*
 'g:go_bin_path'	vim-go.txt	/*'g:go_bin_path'*
 'g:go_def_mapping_enabled'	vim-go.txt	/*'g:go_def_mapping_enabled'*
+'g:go_dispatch_enabled'	vim-go.txt	/*'g:go_dispatch_enabled'*
 'g:go_doc_command'	vim-go.txt	/*'g:go_doc_command'*
 'g:go_doc_keywordprg_enabled'	vim-go.txt	/*'g:go_doc_keywordprg_enabled'*
 'g:go_doc_options'	vim-go.txt	/*'g:go_doc_options'*
@@ -63,6 +64,7 @@
 :CommandTBuffer	command-t.txt	/*:CommandTBuffer*
 :CommandTFlush	command-t.txt	/*:CommandTFlush*
 :CommandTJumps	command-t.txt	/*:CommandTJumps*
+:EditorConfigReload	editorconfig.txt	/*:EditorConfigReload*
 :Emmet	emmet.txt	/*:Emmet*
 :EmmetInstall	emmet.txt	/*:EmmetInstall*
 :FakeclipDefaultKeyMappings	fakeclip.txt	/*:FakeclipDefaultKeyMappings*
@@ -209,6 +211,7 @@
 <Plug>(neosnippet_expand_or_jump)	neosnippet.txt	/*<Plug>(neosnippet_expand_or_jump)*
 <Plug>(neosnippet_jump)	neosnippet.txt	/*<Plug>(neosnippet_jump)*
 <Plug>(neosnippet_jump_or_expand)	neosnippet.txt	/*<Plug>(neosnippet_jump_or_expand)*
+EditorConfig#AddNewHook()	editorconfig.txt	/*EditorConfig#AddNewHook()*
 Emmet	emmet.txt	/*Emmet*
 IndentLinesDisable	indentLine.txt	/*IndentLinesDisable*
 IndentLinesEnable	indentLine.txt	/*IndentLinesEnable*
@@ -248,6 +251,14 @@ config/rails.vim	rails.txt	/*config\/rails.vim*
 cs	surround.txt	/*cs*
 dictionary_complete	neocomplcache.txt	/*dictionary_complete*
 ds	surround.txt	/*ds*
+editorconfig-advanced	editorconfig.txt	/*editorconfig-advanced*
+editorconfig-commands	editorconfig.txt	/*editorconfig-commands*
+editorconfig-contents	editorconfig.txt	/*editorconfig-contents*
+editorconfig-hook	editorconfig.txt	/*editorconfig-hook*
+editorconfig-installation	editorconfig.txt	/*editorconfig-installation*
+editorconfig-overview	editorconfig.txt	/*editorconfig-overview*
+editorconfig-settings	editorconfig.txt	/*editorconfig-settings*
+editorconfig.txt	editorconfig.txt	/*editorconfig.txt*
 emmet	emmet.txt	/*emmet*
 emmet-#	emmet.txt	/*emmet-#*
 emmet-$	emmet.txt	/*emmet-$*
@@ -418,6 +429,13 @@ g:CommandTScanDotDirectories	command-t.txt	/*g:CommandTScanDotDirectories*
 g:CommandTSelectNextMap	command-t.txt	/*g:CommandTSelectNextMap*
 g:CommandTSelectPrevMap	command-t.txt	/*g:CommandTSelectPrevMap*
 g:CommandTToggleFocusMap	command-t.txt	/*g:CommandTToggleFocusMap*
+g:EditorConfig_core_mode	editorconfig.txt	/*g:EditorConfig_core_mode*
+g:EditorConfig_exclude_patterns	editorconfig.txt	/*g:EditorConfig_exclude_patterns*
+g:EditorConfig_exec_path	editorconfig.txt	/*g:EditorConfig_exec_path*
+g:EditorConfig_max_line_indicator	editorconfig.txt	/*g:EditorConfig_max_line_indicator*
+g:EditorConfig_preserve_formatoptions	editorconfig.txt	/*g:EditorConfig_preserve_formatoptions*
+g:EditorConfig_python_files_dir	editorconfig.txt	/*g:EditorConfig_python_files_dir*
+g:EditorConfig_verbose	editorconfig.txt	/*g:EditorConfig_verbose*
 g:emmet_curl_command	emmet.txt	/*g:emmet_curl_command*
 g:emmet_docroot	emmet.txt	/*g:emmet_docroot*
 g:emmet_html5	emmet.txt	/*g:emmet_html5*
